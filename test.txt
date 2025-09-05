@@ -1,0 +1,16 @@
+python generate_problem_state.py -p tsp -l llm_config.json
+python generate_basic_heuristic.py -p tsp -s 'llm' -l llm_config.json
+python evolve_heuristic.py -p tsp -e output/tsp/generate_heuristic/greedy_insertion_constructive_42bc.py -l llm_config.json -ed output/tsp/data/train_data -vd output/tsp/data/validation_data 
+
+python launch_hyper_heuristic.py -p tsp -e 'llm_hh' -l llm_config.json -d evolved_heuristics -t output/tsp/data/test_data/kroC100.tsp.gz
+
+find output/tsp/data/validation_data -name ".DS_Store" -delete
+
+python evolve_heuristic.py -p tsp -e output/tsp/generate_heuristic/greedy_insertion_constructive_42bc.py -l llm_config.json -ed output/tsp/data/train_data -vd output/tsp/data/validation_data --algo map-elites
+
+
+python evolve_heuristic.py -p tsp -e output/tsp/generate_heuristic/greedy_insertion_constructive_42bc.py -l llm_config.json -ed output/tsp/data/train_data -vd output/tsp/data/validation_data --algo map-elites --perturbation_time 10
+
+
+
+python evolve_heuristic.py -p tsp -e src/problems/tsp/heuristics/basic_heuristics/insertion_heuristics_050b.py -l llm_config.json -ed output/tsp/data/train_data -vd output/tsp/data/validation_data --algo map-elites --perturbation_time 10 --perturbation_ratio 0.5 --pe src/problems/tsp/heuristics/basic_heuristics/simulated_annealing_e625.py

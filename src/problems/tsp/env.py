@@ -1,6 +1,8 @@
 import numpy as np
 import networkx as nx
 import tsplib95
+import gzip
+from pathlib import Path
 from src.problems.base.env import BaseEnv
 from src.problems.tsp.components import Solution
 
@@ -17,11 +19,41 @@ class Env(BaseEnv):
     def is_complete_solution(self) -> bool:
         return len(set(self.current_solution.tour)) == self.instance_data["node_num"]
 
-    def load_data(self, data_path: str) -> None:
-        problem = tsplib95.load(data_path)
-        distance_matrix = nx.to_numpy_array(problem.get_graph())
-        node_num = len(distance_matrix)
-        return {"node_num": node_num, "distance_matrix": distance_matrix}
+    def load_data(self, data_path: str) -> dict:  # Changed return type annotation
+        data_path = Path(data_path)
+        
+        try:
+            # Check if file is gzipped
+            if data_path.suffix == '.gz':
+                with gzip.open(data_path, 'rt', encoding='utf-8') as f:
+                    content = f.read()
+                    problem = tsplib95.parse(content)
+            else:
+                problem = tsplib95.load(data_path)
+                
+            # Get the graph and convert to distance matrix
+            graph = problem.get_graph()
+            if graph.number_of_nodes() == 0:
+                raise ValueError(f"No nodes found in problem file: {data_path}")
+                
+            distance_matrix = nx.to_numpy_array(graph)
+            node_num = len(distance_matrix)
+            
+            if node_num == 0:
+                raise ValueError(f"Distance matrix is empty for file: {data_path}")
+                
+            print(f"Loaded TSP problem with {node_num} nodes from {data_path}")
+            return {"node_num": node_num, "distance_matrix": distance_matrix}
+            
+        except Exception as e:
+            print(f"Error loading TSP file {data_path}: {e}")
+            # Try to list a few files in the directory for debugging
+            if data_path.is_dir():
+                files = list(data_path.glob("*.tsp.gz"))[:3]  # First 3 TSP files
+                if files:
+                    print(f"Trying to load first available file: {files[0]}")
+                    return self.load_data(files[0])
+            raise e
 
     def init_solution(self) -> None:
         return Solution(tour=[])

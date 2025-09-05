@@ -20,8 +20,8 @@ class HeuristicEvolver:
     ) -> None:
         self.llm_client = llm_client
         self.problem = problem
-        self.evolution_cases = [os.path.join(evolution_dir, f) for f in os.listdir(evolution_dir)]
-        self.validation_cases = [os.path.join(validation_dir, f) for f in os.listdir(validation_dir)]
+        self.evolution_cases = [os.path.join(evolution_dir, f) for f in os.listdir(evolution_dir) if not f.startswith('.')]
+        self.validation_cases = [os.path.join(validation_dir, f) for f in os.listdir(validation_dir) if not f.startswith('.')]
         self.get_instance_problem_state = load_function("problem_state.py", problem=self.problem, function_name="get_instance_problem_state")
         self.get_solution_problem_state = load_function("problem_state.py", problem=self.problem, function_name="get_solution_problem_state")
 
@@ -63,8 +63,10 @@ class HeuristicEvolver:
         heuristic_dir = os.path.dirname(basic_heuristic_file)
 
         heuristic_introduction_docs = "\n".join([
-            extract_function_with_short_docstring(open(search_file(heuristic_file, self.problem)).read(), heuristic_file.split(".")[0])
-            for heuristic_file in os.listdir(heuristic_dir)
+            doc for doc in [
+                extract_function_with_short_docstring(open(search_file(heuristic_file, self.problem)).read(), heuristic_file.split(".")[0])
+                for heuristic_file in os.listdir(heuristic_dir)
+            ] if doc is not None
         ])
 
         total_heuristic_benchmarks = [(basic_heuristic_file, 0)]
@@ -97,6 +99,7 @@ class HeuristicEvolver:
             max_refinement_round: int=5,
             smoke_test: bool=True
     ) -> list[tuple[str, list[float]]]:
+        refined_heuristic_benchmarks = []  # Initialize at the beginning
         try:
             env = Env(data_name=evolution_data)
             basic_heuristic_name = basic_heuristic_file.split(os.sep)[-1].split(".")[0]
@@ -113,7 +116,6 @@ class HeuristicEvolver:
                 perturbation_time,
             )
 
-            refined_heuristic_benchmarks = []
             if positive_result:
                 print(f"Evolution {basic_heuristic_name} on {evolution_data}")
 
@@ -122,6 +124,7 @@ class HeuristicEvolver:
                 self.load_function_code(basic_heuristic_file, prompt_dict)
 
                 # Identity bottlenecks
+                print(f"Identifying bottlenecks...")
                 bottlenecks = self.identity_bottlenecks(
                     prompt_dict=prompt_dict,
                     env=env,

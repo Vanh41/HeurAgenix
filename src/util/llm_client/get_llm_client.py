@@ -15,6 +15,9 @@ def get_llm_client(
     elif llm_type == "api_model":
         from src.util.llm_client.api_model_client import APIModelClient
         llm_client = APIModelClient(config=config, prompt_dir=prompt_dir, output_dir=output_dir)
+    elif llm_type == "gemini":
+        from src.util.llm_client.gemini_client import GeminiClient
+        llm_client = GeminiClient(config=config, prompt_dir=prompt_dir, output_dir=output_dir)
     elif llm_type == "local_model":
         from src.util.llm_client.local_model_client import LocalModelClient
         llm_client = LocalModelClient(config=config, prompt_dir=prompt_dir, output_dir=output_dir)
