@@ -13,4 +13,4 @@ python evolve_heuristic.py -p tsp -e output/tsp/generate_heuristic/greedy_insert
 
 
 
-python evolve_heuristic.py -p tsp -e src/problems/tsp/heuristics/basic_heuristics/insertion_heuristics_050b.py -l llm_config.json -ed output/tsp/data/train_data -vd output/tsp/data/validation_data --algo map-elites --perturbation_time 10 --perturbation_ratio 0.5 --pe src/problems/tsp/heuristics/basic_heuristics/simulated_annealing_e625.py
+python evolve_heuristic.py -p tsp -e src/problems/tsp/heuristics/basic_heuristics/insertion_heuristics_050b.py -l llm_config.json -ed output/tsp/data/train_data -vd output/tsp/data/validation_data --algo map-elites --perturbation_time 10 --perturbation_ratio 0.5 --perturbation_heuristic src/problems/tsp/heuristics/basic_heuristics/simulated_annealing_e625.py

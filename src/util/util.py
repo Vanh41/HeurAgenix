@@ -258,3 +258,4 @@ def sanitize_function_name(name: str, id_str: str="None"):
     sanitized_name = sanitized_name + "_" + suffix_str
 
     return sanitized_name
+

@@ -7,7 +7,7 @@ from src.util.llm_client.get_llm_client import get_llm_client
 # ROOT_DIR = os.getcwd()
 # logging.basicConfig(level=logging.INFO)
 
-config_file = "llm_config.json"
+config_file = "llm_config1.json"
 llm_client = get_llm_client(config_file=config_file)
 llm_client.load("Are you awake?")
 response = llm_client.chat()

@@ -21,4 +21,7 @@ def get_llm_client(
     elif llm_type == "local_model":
         from src.util.llm_client.local_model_client import LocalModelClient
         llm_client = LocalModelClient(config=config, prompt_dir=prompt_dir, output_dir=output_dir)
+    elif llm_type == "mistral":
+        from src.util.llm_client.mistral_client import MistralClient
+        llm_client = MistralClient(config=config, prompt_dir=prompt_dir, output_dir=output_dir)
     return llm_client
